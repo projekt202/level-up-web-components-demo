@@ -1,0 +1,72 @@
+<html>
+
+<head>
+  <!-- External styles -->
+  <style>
+    html,
+    body {
+      color: steelblue;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Hello Web Components!</h1>
+
+  <!-- Custom element being used -->
+  <my-card></my-card>
+
+  <!-- HTML template -->
+  <template id="card-element-template">
+    <h2>We're in a Custom Element!</h2>
+  </template>
+
+  <!-- Web component -->
+  <script>
+    console.log("Howdy y'all!")
+
+    class Card extends HTMLElement {
+      constructor() {
+        super()
+
+        console.log('Card #constructor called')
+
+        this.root = this.attachShadow({ mode: 'closed' })
+      }
+
+      connectedCallback() {
+        console.log('Card #connectedCallback called')
+
+        this.root.appendChild(this.style);
+        this.root.appendChild(document.getElementById('card-element-template').content.cloneNode(true));
+      }
+
+      disconnectedCallback() {
+        console.log('Card #disconnectedCallback called')
+      }
+
+      attributeChangedCallback(attributeName, oldValue, newValue) {
+        console.log('Card #attributeChangedCallback called')
+        console.log('attributeName:', attributeName)
+        console.log('oldValue:', oldValue)
+        console.log('newValue:', newValue)
+      }
+
+      get style() {
+        const styleElement = document.createElement('style')
+
+        styleElement.innerHTML = `
+          :host {
+            all: initial;
+          }
+        `
+
+        return styleElement
+      }
+    }
+
+    window.customElements.define('my-card', Card)
+  </script>
+</body>
+
+</html>
