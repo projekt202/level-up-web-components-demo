@@ -1,0 +1,195 @@
+<html>
+  <head>
+    <!-- External styles -->
+    <style>
+      *,
+      *:before,
+      *:after {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+
+        color: steelblue;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      }
+
+      body {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+
+        padding: 8px;
+      }
+
+      .app-header {
+        width: 100%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1 class="app-header">Hello Web Components!</h1>
+
+    <!-- STEP 20 - Use custom element. -->
+    <!-- Custom element being used -->
+    <my-card
+      bio="Currently working at Projekt202 as a UI architect, I strive to design and implement elegant systems that will delight those who use them."
+      image-source="https://images.squarespace-cdn.com/content/v1/5820b7b22994ca6b3aee3b1b/1583962093037-HHE7037XGYYJ512358XW/ke17ZwdGBToddI8pDm48kM4blZSrwJ5CciVQEbrs5Lp7gQa3H78H3Y0txjaiv_0fDoOvxcdMmMKkDsyUqMSsMWxHk725yiiHCCLfrh8O1z5QPOohDIaIeljMHgDF5CVlOqpeNLcJ80NK65_fV7S1UepKJhGgGI16XEK36NuJ-x2Dm1d0M3nN_550EnyilbdUAsSUv0QozxITGy5JF5yIEA/Jonathan_Darling.jpg?format=500w"
+      name="Jonathan Darling"
+    >
+    </my-card>
+
+    <!-- STEP 1 -->
+    <!-- HTML template -->
+    <template id="card-element-template">
+      <div class="card">
+        <h3 class="card__name"></h3>
+        <img class="card__image" />
+        <p class="card__bio"></p>
+      </div>
+    </template>
+
+    <!-- Web component -->
+    <script>
+      // STEP 2 - Create Class
+      class MyCard extends HTMLElement {
+        // STEP 3 - Create constructor.
+        constructor() {
+          super();
+
+          // STEP 8 - Create shadow root.
+          this.root = this.attachShadow({ mode: "closed" });
+
+          // STEP 11 - Append styles.
+          this.root.appendChild(this.style);
+
+          // STEP 9 - Append template.
+          this.root.appendChild(this.template);
+        }
+
+        // STEP 4 - Observed attributes.
+        // This is a required getter that tells the base element what attributes to "care" about.
+        static get observedAttributes() {
+          return ["bio", "image-source", "name"];
+        }
+
+        // STEP 10 - Create a way to get our styles.
+        get style() {
+          const styleElement = document.createElement("style");
+
+          styleElement.innerHTML = `
+          :host *, :host *:before, host *:after {
+            box-sizing: border-box;
+          }
+
+          .card {
+            display: flex;
+            flex-wrap: wrap;
+
+            max-width: 240px;
+            width: 100%;
+            padding: 8px;
+
+            border-radius: 4px;
+            box-shadow: 4px 4px 8px 4px #AFAFAF;
+          }
+
+          .card__bio {
+            order: 3;
+          }
+
+          .card__image {
+            order: 1;
+
+            margin: -8px -8px 0 -8px;
+            width: calc(100% + 16px);
+
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+          }
+
+          .card__name {
+            order: 2;
+          }
+        `;
+
+          return styleElement;
+        }
+
+        // STEP 7 - Create a way to get our template.
+        get template() {
+          return document
+            .getElementById("card-element-template")
+            .content.cloneNode(true);
+        }
+
+        // STEP 5 - Connected callback.
+        // This is called when the component is "mounted".
+        connectedCallback() {
+          // Nothing to do for our use case! This is commonly used to set up subscriptions, or perform service calls.
+        }
+
+        // STEP 6 - Disconnected callback.
+        // This is called when the component is "un-mounted".
+        disconnectedCallback() {
+          // Nothing to do for our use case! This is commonly used to cancel open subscriptions.
+        }
+
+        // STEP 6 - Attribute changed callback.
+        // This is called whenever an attribute (a "prop" if you're comfortable in React) changes.
+        attributeChangedCallback(attributeName, oldValue, newValue) {
+          // STEP 12 - Set up attribute changed callback.
+          // In our use case, we only need to perform updates if the value actually changes. Not all use-cases will
+          // reflect this same pattern.
+          if (oldValue === newValue) {
+            return;
+          }
+
+          // STEP 13 - Set up attribute changed callback switch.
+          switch (attributeName) {
+            case "bio":
+              // STEP 14 - Set up update bio.
+              this.updateBio(newValue);
+              break;
+            case "image-source":
+              // STEP 16 - Set up update image source
+              this.updateImageSource(newValue);
+              break;
+            case "name":
+              // STEP 18 - Set up update image source
+              this.updateName(newValue);
+              break;
+          }
+        }
+
+        // STEP 15 - Set up update bio handler.
+        updateBio(newBio) {
+          const element = this.root.querySelector(".card__bio");
+          element.innerHTML = newBio;
+        }
+
+        // STEP 17 - Set up update bio handler.
+        updateImageSource(newImageSource) {
+          const element = this.root.querySelector(".card__image");
+          element.setAttribute("src", newImageSource);
+        }
+
+        // STEP 19 - Set up update bio handler.
+        updateName(newName) {
+          const element = this.root.querySelector(".card__name");
+          element.innerHTML = newName;
+        }
+      }
+
+      // STEP 21 - Define.
+      window.customElements.define("my-card", MyCard);
+    </script>
+  </body>
+</html>
