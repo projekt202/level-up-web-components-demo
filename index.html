@@ -36,11 +36,131 @@
   <body>
     <h1 class="app-header">Hello Web Components!</h1>
 
+    <!-- Custom Element Usage -->
+    <my-card
+      bio="Currently working at Projekt202 as a UI architect, I strive to design and implement elegant systems that will delight those who use them."
+      image-source="https://images.squarespace-cdn.com/content/v1/5820b7b22994ca6b3aee3b1b/1583962093037-HHE7037XGYYJ512358XW/ke17ZwdGBToddI8pDm48kM4blZSrwJ5CciVQEbrs5Lp7gQa3H78H3Y0txjaiv_0fDoOvxcdMmMKkDsyUqMSsMWxHk725yiiHCCLfrh8O1z5QPOohDIaIeljMHgDF5CVlOqpeNLcJ80NK65_fV7S1UepKJhGgGI16XEK36NuJ-x2Dm1d0M3nN_550EnyilbdUAsSUv0QozxITGy5JF5yIEA/Jonathan_Darling.jpg?format=500w"
+      name="Jonathan Darling"
+    >
+    </my-card>
+
     <!-- HTML Template -->
+    <template id="card-element-template">
+      <div class="card">
+        <h3 class="card__name"></h3>
+        <img class="card__image" />
+        <p class="card__bio"></p>
+      </div>
+    </template>
 
     <!-- Custom Element -->
     <script>
-      
+      class MyCard extends HTMLElement {
+        constructor() {
+          super();
+
+          // Create the Shadow DOM.
+          this.root = this.attachShadow({ mode: "closed" });
+
+          // Add the <style> to the Shadow DOM.
+          this.root.appendChild(this.style);
+
+          // Add the component <template> to the Shadow DOM.
+          this.root.appendChild(this.template);
+        }
+
+        get style() {
+          const styleElement = document.createElement("style");
+
+          styleElement.innerHTML = `
+          // Uncomment this to allow "inherited styles" to "bleed" into the Web Component.
+          // :host {
+          //   all: initial;
+          // }
+
+          :host *, :host *:before, host *:after {
+            box-sizing: border-box;
+          }
+
+          .card {
+            display: flex;
+            flex-wrap: wrap;
+
+            max-width: 240px;
+            width: 100%;
+            padding: 8px;
+
+            border-radius: 4px;
+            box-shadow: 4px 4px 8px 4px #AFAFAF;
+          }
+
+          .card__bio {
+            order: 3;
+          }
+
+          .card__image {
+            order: 1;
+
+            margin: -8px -8px 0 -8px;
+            width: calc(100% + 16px);
+
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+          }
+
+          .card__name {
+            order: 2;
+          }
+        `;
+
+          return styleElement;
+        }
+
+        get template() {
+          return document
+            .getElementById("card-element-template")
+            .content.cloneNode(true);
+        }
+
+        static get observedAttributes() {
+          return ["bio", "image-source", "name"];
+        }
+
+        attributeChangedCallback(attributeName, oldValue, newValue) {
+          if (oldValue === newValue) {
+            return;
+          }
+
+          switch(attributeName) {
+            case "bio":
+              this.updateBio(newValue);
+              break;
+            case "image-source":
+              this.updateImageSource(newValue);
+              break;
+            case "name":
+              this.updateName(newValue);
+              break;
+          }
+        }
+
+        updateBio(newBio) {
+          const element = this.root.querySelector(".card__bio");
+          element.innerHTML = newBio;
+        }
+
+        updateImageSource(newImageSource) {
+          const element = this.root.querySelector(".card__image");
+          element.setAttribute("src", newImageSource);
+        }
+
+        updateName(newName) {
+          const element = this.root.querySelector(".card__name");
+          element.innerHTML = newName;
+        }
+      }
+
+      window.customElements.define("my-card", MyCard);
     </script>
   </body>
 </html>
